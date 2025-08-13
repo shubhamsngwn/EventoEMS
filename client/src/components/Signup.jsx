@@ -48,13 +48,15 @@ export default function Signup() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/signup", {
+      const res = await axios.post("http://localhost:5000/api/signup", {
         name,
         email,
         password,
         confirm_password: confirmPassword,
         category: activeButton,
       });
+
+      console.log(res.data);
 
       toast.success(res.data.message);
       setName("");
