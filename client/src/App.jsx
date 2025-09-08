@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./components/Signup";
 import Main from "./components/Main";
 import MyCalendar from "./components/MyCalendar";
+import Dashboard from "./components/Dashboard";
+import EventTemplate from "./components/EventTemplate";
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/calendar" element={<MyCalendar />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Router>
     </>

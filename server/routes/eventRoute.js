@@ -9,6 +9,7 @@ eventRouter.get("/getAllEvents", isAuthenticated, getAllEvents);
 eventRouter.get("/getEvent/:id", isAuthenticated, getEventById);
 eventRouter.post("/likeEvent/:id", isAuthenticated, likeEvent); // checked successfully
 
+//not checked
 eventRouter.get("/orderSummary/:id", isAuthenticated, orderSummary);
 eventRouter.get("/getEventById/:id", isAuthenticated, createPaymentSummary);
 

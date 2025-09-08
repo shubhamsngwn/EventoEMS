@@ -43,7 +43,7 @@
 //   ticketPrice: {
 //     type: Number,
 //   },
-//   Quantity: {
+//   Quantity: {//no of seats
 //     type: Number,
 //     required: true,
 //   },

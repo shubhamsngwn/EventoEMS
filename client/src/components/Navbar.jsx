@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import EventImg from "../images/logo.png";
 import "../App.css";
-import Main from "./Main";
+import Avatar from "./UserAvatar";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -30,6 +30,8 @@ export default function Navbar() {
   const openCalendar = () => {
     navigate("/calendar");
   };
+  const category = localStorage.getItem("userCategory");
+  const email = localStorage.getItem("userEmail");
 
   return (
     <>
@@ -43,13 +45,15 @@ export default function Navbar() {
           <input type="text" placeholder="Search" className="search-input" />
         </div>
 
-        <div
-          className="create-event flex flex-col items-center text-blue-600 font-semibold cursor-pointer hover:text-blue-700 ml-6 w-20 text-center"
-          onClick={openCreateEvent}
-        >
-          <FontAwesomeIcon icon={faPlus} className="mb-1 text-xl" />
-          <p className="text-sm">Create Event</p>
-        </div>
+        {category !== "attendee" && (
+          <div
+            className="create-event flex flex-col items-center text-blue-600 font-semibold cursor-pointer hover:text-blue-700 ml-6 w-20 text-center"
+            onClick={openCreateEvent}
+          >
+            <FontAwesomeIcon icon={faPlus} className="mb-1 text-xl" />
+            <p className="text-sm">Create Event</p>
+          </div>
+        )}
 
         <div className="icon-menu">
           <div className="icon-item">
@@ -69,9 +73,13 @@ export default function Navbar() {
         <div className="notification-icon">
           <FontAwesomeIcon icon={faBell} />
         </div>
-        <div className="sign-in">
-          <button onClick={openLoginPage}>Sign in</button>
-        </div>
+        {category && email ? (
+          <Avatar />
+        ) : (
+          <div className="sign-in">
+            <button onClick={openLoginPage}>Sign in</button>
+          </div>
+        )}
       </div>
     </>
   );

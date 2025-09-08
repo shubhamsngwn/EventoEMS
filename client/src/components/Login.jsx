@@ -42,7 +42,6 @@ export default function Login() {
         password,
         category: activeButton,
       });
-
       toast.success(res.data.message);
       setTimeout(() => {
         navigate("/");
