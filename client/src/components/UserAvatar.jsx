@@ -1,16 +1,3 @@
-// import React from "react";
-// import Avatar from 'react-avatar';
-
-// export default function UserAvatar() {
-//   const userName = localStorage.getItem("userName") || "Guest";
-
-//   return (
-//     <div className="client">
-//       <Avatar name={userName} size="40" round="20%"/>
-//     </div>
-//   );
-// }
-
 import React, { useState } from "react";
 import AvatarLib from "react-avatar";
 import { useNavigate } from "react-router-dom";

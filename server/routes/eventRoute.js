@@ -1,16 +1,37 @@
 import express from "express";
-import { createEvent, createPaymentSummary, getAllEvents, getEventById, likeEvent, orderSummary } from "../controllers/eventController.js";
-import isAuthenticated from "../middlewares/isAuthenticated.js";
+import multer from "multer";
+import path from "path";
+import {
+  createEvent,
+  getAllEvents,
+  getEventById,
+  likeEvent,
+  orderSummary,
+  createPaymentSummary,
+  deleteEvent,
+} from "../controllers/eventController.js";
 
 const eventRouter = express.Router();
 
-eventRouter.post("/createEvent", isAuthenticated, createEvent);
-eventRouter.get("/getAllEvents", isAuthenticated, getAllEvents);
-eventRouter.get("/getEvent/:id", isAuthenticated, getEventById);
-eventRouter.post("/likeEvent/:id", isAuthenticated, likeEvent); // checked successfully
+// ✅ Multer setup for image upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
-//not checked
-eventRouter.get("/orderSummary/:id", isAuthenticated, orderSummary);
-eventRouter.get("/getEventById/:id", isAuthenticated, createPaymentSummary);
+const upload = multer({ storage });
+
+// ✅ Routes
+eventRouter.post("/createEvent", upload.single("flyer"), createEvent);
+eventRouter.get("/getAllEvents", getAllEvents);
+eventRouter.get("/getEvent/:id", getEventById);
+eventRouter.put("/likeEvent/:id", likeEvent);
+eventRouter.get("/orderSummary/:id", orderSummary);
+eventRouter.get("/paymentSummary/:id", createPaymentSummary);
+eventRouter.delete("/deleteEvent/:id", deleteEvent);
 
 export default eventRouter;

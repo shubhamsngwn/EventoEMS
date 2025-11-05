@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAt,
@@ -37,12 +37,15 @@ export default function Login() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/login", {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
         category: activeButton,
       });
       toast.success(res.data.message);
+      localStorage.setItem("userName", res.data.user.name);
+      localStorage.setItem("userEmail", res.data.user.email);
+      localStorage.setItem("userCategory", res.data.user.category);
       setTimeout(() => {
         navigate("/");
       }, 2000);
@@ -51,15 +54,22 @@ export default function Login() {
     }
   };
 
+  useEffect(() => {
+    const category = localStorage.getItem("userCategory");
+    const email = localStorage.getItem("userEmail");
+
+    if (category && email) {
+      toast.info(`You're already logged in as ${category}`);
+    }
+  }, []);
+
   return (
     <div className="login-container">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Left side form */}
       <div className="login-box">
         <h3 className="login-title">Sign In as</h3>
 
-        {/* Organizer / Attendee buttons */}
         <div className="btn-group">
           <button
             className={
@@ -79,7 +89,6 @@ export default function Login() {
           </button>
         </div>
 
-        {/* Email input */}
         <div className="input-group">
           <FontAwesomeIcon icon={faAt} className="input-icon" />
           <input
@@ -91,7 +100,6 @@ export default function Login() {
           />
         </div>
 
-        {/* Password input */}
         <div className="input-group">
           <FontAwesomeIcon icon={faKey} className="input-icon" />
           <input
@@ -108,7 +116,6 @@ export default function Login() {
           />
         </div>
 
-        {/* Remember me and forgot password */}
         <div className="options-row">
           <label>
             <input type="checkbox" /> Remember Me
@@ -118,12 +125,10 @@ export default function Login() {
           </a>
         </div>
 
-        {/* Sign In button */}
         <button className="btn-primary" onClick={handleLogin}>
           Sign In
         </button>
 
-        {/* Switch to Sign Up */}
         <div className="btn-group">
           <button className="btn-active">Sign In</button>
           <button className="btn-inactive" onClick={openSignUp}>
@@ -131,14 +136,12 @@ export default function Login() {
           </button>
         </div>
 
-        {/* Back button */}
         <div className="back-button" onClick={handleBack}>
           <FontAwesomeIcon icon={faArrowLeft} />
           <span>Back</span>
         </div>
       </div>
 
-      {/* Right side images */}
       <div className="login-image">
         <h1>Welcome to</h1>
         <img src={EventImg} alt="Evento EMS" className="top-image" />

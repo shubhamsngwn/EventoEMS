@@ -7,7 +7,6 @@ import Signup from "./components/Signup";
 import Main from "./components/Main";
 import MyCalendar from "./components/MyCalendar";
 import Dashboard from "./components/Dashboard";
-import EventTemplate from "./components/EventTemplate";
 
 function App() {
   return (

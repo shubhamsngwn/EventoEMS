@@ -30,6 +30,7 @@ export default function Navbar() {
   const openCalendar = () => {
     navigate("/calendar");
   };
+  const name = localStorage.getItem("userName");
   const category = localStorage.getItem("userCategory");
   const email = localStorage.getItem("userEmail");
 

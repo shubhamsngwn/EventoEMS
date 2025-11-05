@@ -1,125 +1,63 @@
-// import mongoose from "mongoose";
-
-// const EventSchema = new mongoose.Schema({
-//   owner: {
-//     type: String,
-//     required: true,
-//   },
-//   title: {
-//     type: String,
-//     required: true,
-//   },
-//   description: {
-//     type: String,
-//     required: true,
-//   },
-//   organizedBy: {
-//     type: String,
-//     required: true,
-//   },
-//   eventDate: {
-//     type: Date,
-//     required: true,
-//   },
-//   eventTime: {
-//     type: String,
-//     required: true,
-//   },
-//   location: {
-//     type: String,
-//     required: true,
-//   },
-//   Participants: {
-//     type: Number,
-//     required: true,
-//   },
-//   Count: {
-//     type: Number,
-//     required: true,
-//   },
-//   Income: {
-//     type: Number,
-//   },
-//   ticketPrice: {
-//     type: Number,
-//   },
-//   Quantity: {//no of seats
-//     type: Number,
-//     required: true,
-//   },
-//   image: {
-//     type: String,
-//     required: true,
-//   },
-//   likes: {
-//     type: Number,
-//   },
-//   Comment: {
-//     type: [String],
-//   },
-// }, {timestamps: true});
-
-// const Event = mongoose.model("Event", EventSchema);
-// export default Event;
 import Event from "../Models/event.js";
-
-//  api 1:- create event
+// API 1: Create Event
 export const createEvent = async (req, res) => {
   try {
     const {
-      owner,
       title,
-      description,
-      organizedBy,
-      eventDate,
-      eventTime,
+      organisedBy,
+      eventDescription,
       location,
-      Participants,
-      Count,
-      Income,
       ticketPrice,
-      Quantity,
-      image,
-      likes,
-      Comment,
+      totalSeats,
     } = req.body;
 
+    const eventDate = req.body.eventDate;
+    const eventTime = req.body.eventTime;
+
+    // ✅ File (flyer) handle
+    const imagePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
+
     const newEvent = new Event({
-      owner,
-      title,
-      description,
-      organizedBy,
-      eventDate,
-      eventTime,
-      location,
-      Participants,
-      Count,
-      Income,
-      ticketPrice,
-      Quantity,
-      image,
-      likes,
-      Comment,
+      owner: "admin", // replace with logged-in user's id if available
+      title: title,
+      description: eventDescription,
+      organizedBy: organisedBy,
+      eventDate: eventDate,
+      eventTime: eventTime,
+      location: location,
+      Participants: 0,
+      Count: 0,
+      Income: 0,
+      ticketPrice: ticketPrice,
+      Quantity: totalSeats,
+      image: imagePath,
+      likes: 0,
+      Comment: [],
     });
 
     await newEvent.save();
-    res
-      .status(201)
-      .json({
-        message: "Event created successfully",
-        event: newEvent,
-        success: true,
-      });
+
+    res.status(201).json({
+      success: true,
+      message: "Event created successfully",
+      event: newEvent,
+    });
   } catch (error) {
     console.error("Error creating event:", error);
-    res.status(500).json({ message: "Internal server error", success: false });
+    res.status(500).json({
+      success: false,
+      message: "Failed to create event",
+      error: error.message,
+    });
   }
 };
 
-// api 2 :- get all events
+// =========================
+// API 2: Get all events
+// =========================
 export const getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find();
+    const events = await Event.find().sort({ createdAt: -1 });
     res.status(200).json({ events, success: true });
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -127,68 +65,109 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-
-// api 3 :- get event by id
+// =========================
+// API 3: Get event by ID
+// =========================
 export const getEventById = async (req, res) => {
-    const {id} = req.params;
-    try{
-        const event = await Event.findById(id);
-        if(!event){
-            return res.status(404).json({ message: "Event not found", success: false });
-        }
-        res.status(200).json({ event, success: true });
-    }catch{
-        res.status(404).json({ message: "Event not found", success: false });
+  const { id } = req.params;
+  try {
+    const event = await Event.findById(id);
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: "Event not found", success: false });
     }
+    res.status(200).json({ event, success: true });
+  } catch (error) {
+    res.status(404).json({ message: "Event not found", success: false });
+  }
 };
 
-// api 4 :- like an event
+// =========================
+// API 4: Like Event
+// =========================
 export const likeEvent = async (req, res) => {
-    const {id} = req.params;
-    try{
-        const event = await Event.findById(id);
-        if(!event){
-            return res.status(404).json({ message: "Event not found", success: false });
-        }
-        event.likes = event.likes ? event.likes + 1 : 1;
-        await event.save();
-        res.status(200).json({ event, success: true });
-    }catch{
-        res.status(404).json({ message: "Event not found", success: false });
+  const { id } = req.params;
+  try {
+    const event = await Event.findById(id);
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: "Event not found", success: false });
     }
+    event.likes = event.likes ? event.likes + 1 : 1;
+    await event.save();
+    res.status(200).json({ event, success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Error liking event", success: false });
+  }
 };
 
-
-// api 5 :- order summary of create event
+// =========================
+// API 5: Order Summary
+// =========================
 export const orderSummary = async (req, res) => {
-    const {id} = req.params;
-    try{
-        const event = await Event.findById(id);
-        if(!event){
-            return res.status(404).json({ message: "Event not found", success: false });
-        }
-        res.status(200).json({ event, success: true });
-    }catch{
-        res.status(404).json({ message: "Event not found", success: false });
+  const { id } = req.params;
+  try {
+    const event = await Event.findById(id);
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: "Event not found", success: false });
     }
+    res.status(200).json({ event, success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
 };
 
-// api 6 :- get the payment summary
+// =========================
+// API 6: Payment Summary
+// =========================
 export const createPaymentSummary = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const event = await Event.findById(id);
-        if (!event) {
-            return res.status(404).json({ message: "Event not found", success: false });
-        }
-        // Calculate payment summary
-        const paymentSummary = {
-            totalIncome: event.Income,
-            totalTickets: event.Quantity,
-            ticketPrice: event.ticketPrice,
-        };
-        res.status(200).json({ paymentSummary, success: true });
-    } catch {
-        res.status(404).json({ message: "Event not found", success: false });
+  const { id } = req.params;
+  try {
+    const event = await Event.findById(id);
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: "Event not found", success: false });
     }
+
+    const paymentSummary = {
+      totalIncome: event.income,
+      totalTickets: event.quantity,
+      ticketPrice: event.ticketPrice,
+    };
+
+    res.status(200).json({ paymentSummary, success: true });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
+};
+
+// =========================
+// API 7: Delete Event
+// =========================
+export const deleteEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const deletedEvent = await Event.findByIdAndDelete(eventId);
+
+    if (!deletedEvent) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Event not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Event deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while deleting event",
+    });
+  }
 };

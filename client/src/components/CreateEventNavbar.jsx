@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import EventImg from "../images/logo.png";
 import "../App.css";
+import Avatar from 'react-avatar';
 
 export default function CreateEventNavbar() {
 

@@ -3,17 +3,6 @@ import "../App.css";
 import EventImg from "../images/logo.png";
 
 export default function EventTemplate() {
-  const event = {
-    event_name: "Standup Comedy",
-    event_details: {
-      event_time: "6:00",
-      event_day: "Thursday",
-      event_date: "23rd October",
-    },
-    about_event:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusantium provident praesentium obcaecati molestias esse dolor optio sapiente eum tenetur hic. Incidunt explicabo tempora quae a natus possimus impedit non sequi!",
-    organised_by: "Students-Society",
-  };
 
   return (
     <>

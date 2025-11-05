@@ -7,10 +7,72 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import dayjs from "dayjs";
 import CreateEventNavbar from "./CreateEventNavbar";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateEvent() {
+  const navigate = useNavigate();
+
+  const [eventData, setEventData] = React.useState({
+    title: "",
+    organisedBy: "",
+    eventType: "",
+    location: "",
+    eventDescription: "",
+    eventGoal: "",
+    contactInfo: "",
+    totalSeats: "",
+    ticketPrice: "",
+    caption: "",
+    flyer: "",
+  });
+
   const [eventDate, setEventDate] = React.useState(null);
   const [eventTime, setEventTime] = React.useState(null);
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setEventData({
+      ...eventData,
+      [name]: files ? files[0] : value, // store actual file, not file name
+    });
+  };
+
+  // Submit handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData();
+
+      // append all event data to formData
+      Object.entries(eventData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      if (eventDate)
+        formData.append("eventDate", eventDate.format("YYYY-MM-DD"));
+      if (eventTime) formData.append("eventTime", eventTime.format("HH:mm"));
+
+      // ✅ Corrected API endpoint
+      const res = await fetch("http://localhost:5000/api/event/createEvent", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Event created successfully!");
+        navigate("/");
+      } else {
+        alert("Failed to create event: " + (data.message || ""));
+      }
+    } catch (err) {
+      console.error("Error creating event:", err);
+      alert("Something went wrong!");
+    }
+  };
 
   return (
     <>
@@ -21,29 +83,24 @@ export default function CreateEvent() {
         </div>
         <div className="crt-main">
           <div className="crt-col1">
-            <div className="create-elements1">
+            <form onSubmit={handleSubmit}>
               <TextField
-                id="outlined-basic"
+                name="title"
                 label="Title"
                 variant="outlined"
+                onChange={handleChange}
                 sx={{
                   width: "20.75rem",
                   mb: 2,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
+
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Event Date"
@@ -54,47 +111,32 @@ export default function CreateEvent() {
                     width: "15.75rem",
                     mb: 2,
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "blue",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "blue",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "blue",
-                      },
+                      "& fieldset": { borderColor: "blue" },
+                      "&:hover fieldset": { borderColor: "blue" },
+                      "&.Mui-focused fieldset": { borderColor: "blue" },
                     },
                   }}
-                  renderInput={(params) => <TextField {...params} />}
                   required
                 />
               </LocalizationProvider>
-              <br />
-            </div>
 
-            <div className="create-elements2">
               <TextField
-                id="outlined-basic"
+                name="organisedBy"
                 label="Organised By"
                 variant="outlined"
+                onChange={handleChange}
                 sx={{
                   width: "20.75rem",
                   mb: 2,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
+
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <TimePicker
                   label="Event Time"
@@ -104,257 +146,176 @@ export default function CreateEvent() {
                     width: "15.75rem",
                     mb: 2,
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "blue",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "blue",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "blue",
-                      },
+                      "& fieldset": { borderColor: "blue" },
+                      "&:hover fieldset": { borderColor: "blue" },
+                      "&.Mui-focused fieldset": { borderColor: "blue" },
                     },
                   }}
                   required
-                  renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
-              <br />
-            </div>
 
-            <div>
               <TextField
-                id="outlined-multiline-static"
+                name="eventType"
                 label="Event Type"
                 multiline
                 rows={4}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-            </div>
 
-            <div>
               <TextField
-                id="outlined-basic"
+                name="location"
                 label="Location"
-                variant="outlined"
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-            </div>
 
-            <div>
               <TextField
-                id="outlined-multiline-static"
+                name="eventDescription"
                 label="Event Description"
                 multiline
                 rows={4}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-            </div>
 
-            <div>
               <TextField
-                id="outlined-multiline-static"
+                name="eventGoal"
                 label="Event Goal"
                 multiline
                 rows={4}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-            </div>
 
-            <TextField
-              id="outlined-basic"
-              label="Contact Info"
-              variant="outlined"
-              sx={{
-                width: "100%",
-                mb: 3.5,
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "blue",
+              <TextField
+                name="contactInfo"
+                label="Contact Info"
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  mb: 3.5,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
-                  "&:hover fieldset": {
-                    borderColor: "blue",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "blue",
-                  },
-                },
-              }}
-              required
-            />
-            <br />
+                }}
+                required
+              />
 
-            <div className="ticket-details">
               <h2>Ticket Details:</h2>
-            </div>
 
-            <div>
               <TextField
-                id="outlined-basic"
+                name="totalSeats"
                 label="Total Seats"
-                variant="outlined"
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
+
               <TextField
-                id="outlined-basic"
+                name="ticketPrice"
                 label="Ticket Price"
-                variant="outlined"
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-            </div>
 
-            <div className="promotion-details">
               <h2>Promotion Details</h2>
-            </div>
 
-            <div>
               <TextField
-                id="outlined-basic"
+                name="flyer"
                 label="Main Event Flyer"
                 variant="outlined"
                 type="file"
                 InputLabelProps={{ shrink: true }}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   mb: 3.5,
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
                   },
                 }}
                 required
               />
-              <br />
-              <TextField
-                id="outlined-basic"
-                label="Caption"
-                variant="outlined"
-                sx={{
-                  width: "100%",
-                  mb: 3.5,
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "blue",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "blue",
-                    },
-                  },
-                }}
-                required
-              />
-              <br />
-            </div>
 
-            <div className="submit-btn">
-              <button>Submit</button>
-            </div>
+              <TextField
+                name="caption"
+                label="Caption"
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  mb: 3.5,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "blue" },
+                    "&:hover fieldset": { borderColor: "blue" },
+                    "&.Mui-focused fieldset": { borderColor: "blue" },
+                  },
+                }}
+                required
+              />
+
+              <div className="submit-btn">
+                <button type="submit">Submit</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
