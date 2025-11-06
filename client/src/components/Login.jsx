@@ -46,6 +46,7 @@ export default function Login() {
       localStorage.setItem("userName", res.data.user.name);
       localStorage.setItem("userEmail", res.data.user.email);
       localStorage.setItem("userCategory", res.data.user.category);
+      localStorage.setItem("token", res.data.token);
       setTimeout(() => {
         navigate("/");
       }, 2000);

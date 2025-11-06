@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../Models/user.js";
 import jwt from "jsonwebtoken";
+import { sendMail } from "../utils/sendMail.js"; // ✅ ADD THIS
 
 // api 1 :- creating new user into database
 export const signup = async (req, res) => {
@@ -40,7 +41,7 @@ export const signup = async (req, res) => {
   }
 };
 
-// api 2 :- creating user login
+// api 2 :- login user
 export const login = async (req, res) => {
   const { email, password, category } = req.body;
 
@@ -67,7 +68,14 @@ export const login = async (req, res) => {
         .json({ message: "Invalid credentials", success: false });
     }
 
-    // Generate JWT token
+    // ✅ ✅ ✅ EMAIL SEND HERE AFTER SUCCESSFUL LOGIN
+    await sendMail(
+      user.email,
+      "Login Detected - Event Management System",
+      `Hello ${user.name}, your account was just logged in on EventoEMS.\n\nIf this wasn't you, please reset your password immediately.`
+    );
+
+    // ✅ JWT Token
     const token = jwt.sign(
       { userId: user._id, email: user.email, category: user.category },
       process.env.JWT_SECRET,
@@ -105,7 +113,7 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-// api 4 :- logout the user
+// api 4 :- logout
 export const logout = async (req, res) => {
   try {
     res.clearCookie("token");
@@ -116,7 +124,7 @@ export const logout = async (req, res) => {
   }
 };
 
-// api 5 :- update your profile
+// api 5 :- update profile
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.id;
@@ -124,13 +132,11 @@ export const updateProfile = async (req, res) => {
 
     const { name, category } = req.body;
 
-    // Check if a file is uploaded
     let profilePicture = null;
     if (req.file) {
-      profilePicture = req.file.filename; // stored filename by multer
+      profilePicture = req.file.filename;
     }
 
-    // Construct update object
     const updateData = { name, category };
     if (profilePicture) {
       updateData.profilePicture = profilePicture;
@@ -146,13 +152,11 @@ export const updateProfile = async (req, res) => {
         .json({ message: "User not found", success: false });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Profile updated successfully",
-        user: updatedUser,
-        success: true,
-      });
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+      success: true,
+    });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Internal server error", success: false });

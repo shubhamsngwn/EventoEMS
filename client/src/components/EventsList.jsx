@@ -28,18 +28,44 @@ export default function EventsList() {
     setShowModal(true);
   };
 
-  // ✅ Confirm booking handler
-  const handleConfirmBooking = () => {
-    const total = selectedEvent.ticketPrice * tickets;
-    alert(`You have booked ${tickets} ticket(s) for ${selectedEvent.title}.
-Total amount: ₹${total}`);
-    setShowModal(false);
+  // ✅ Confirm booking handler (fully updated)
+  const handleConfirmBooking = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("You must be logged in to book tickets!");
+        return;
+      }
+
+      const res = await axios.post(
+        "http://localhost:5000/api/booking/book",
+        {
+          eventId: selectedEvent._id,
+          seats: tickets,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        alert("✅ Booking Successful! Check your email for confirmation.");
+        setShowModal(false);
+      } else {
+        alert("Something went wrong!");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      alert("Booking failed, please try again.");
+    }
   };
 
   // ✅ Edit event handler
   const handleEditEvent = (eventId) => {
     alert(`Edit functionality for event ID: ${eventId}`);
-    // navigate(`/edit-event/${eventId}`)   // if you add edit page later
   };
 
   // ✅ Delete event handler
@@ -51,12 +77,11 @@ Total amount: ₹${total}`);
         );
         if (res.data.success) {
           alert("Event deleted successfully!");
-          // Remove deleted event from state
           setEvents(events.filter((e) => e._id !== eventId));
         }
       } catch (err) {
         console.error("Error deleting event:", err);
-        alert("Failed to delete event. Please try again.");
+        alert("Failed to delete event.");
       }
     }
   };
@@ -85,7 +110,7 @@ Total amount: ₹${total}`);
               <strong>Ticket Price:</strong> ₹{e.ticketPrice}
             </p>
 
-            {/* ✅ Conditional buttons based on role */}
+            {/* ✅ Conditional buttons */}
             {userRole === "attendee" ? (
               <div className="event-buttons">
                 <button className="book-btn" onClick={() => handleBookNow(e)}>
