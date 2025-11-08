@@ -7,6 +7,7 @@ import Signup from "./components/Signup";
 import Main from "./components/Main";
 import MyCalendar from "./components/MyCalendar";
 import Dashboard from "./components/Dashboard";
+import Wallet from "./components/Wallet";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/calendar" element={<MyCalendar />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/wallet" element={<Wallet />} />
         </Routes>
       </Router>
     </>

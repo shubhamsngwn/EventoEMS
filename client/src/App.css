@@ -1074,3 +1074,100 @@
   display: block;
   opacity: 1;
 }
+
+.wallet-container {
+  padding: 20px;
+}
+
+.ticket-box {
+  display: flex;
+  background: #fff;
+  border-radius: 12px;
+  border: 2px dashed #999;
+  padding: 20px;
+  margin-bottom: 20px;
+  align-items: center;
+  gap: 20px;
+}
+
+.ticket-qr-section {
+  background: #f7f7f7;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  width: 180px;
+  border: 1px solid #ddd;
+}
+
+.ticket-id {
+  margin-top: 10px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #444;
+}
+
+.ticket-details {
+  flex: 1;
+}
+
+.ticket-details h2 {
+  margin-bottom: 10px;
+}
+
+.ticket-details p {
+  margin: 4px 0;
+  font-size: 15px;
+}
+
+.wallet-page {
+  padding: 30px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.wallet-title {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.no-tickets {
+  text-align: center;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.ticket-card {
+  display: flex;
+  gap: 25px;
+  background: #f7f9ff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.qr-box {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+.qr-label {
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.ticket-details h2 {
+  margin-bottom: 6px;
+  font-size: 22px;
+}
+
+.ticket-details p {
+  margin: 4px 0;
+  font-size: 15px;
+}

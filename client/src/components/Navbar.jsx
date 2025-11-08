@@ -30,6 +30,11 @@ export default function Navbar() {
   const openCalendar = () => {
     navigate("/calendar");
   };
+
+  const openWallet = () => {
+    navigate("/wallet");
+  };
+
   const name = localStorage.getItem("userName");
   const category = localStorage.getItem("userCategory");
   const email = localStorage.getItem("userEmail");
@@ -57,7 +62,7 @@ export default function Navbar() {
         )}
 
         <div className="icon-menu">
-          <div className="icon-item">
+          <div className="icon-item" onClick={openWallet}>
             <FontAwesomeIcon icon={faWallet} className="menu-icon" />
             <span>Wallet</span>
           </div>
