@@ -7,9 +7,10 @@ export default function EventsList() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [tickets, setTickets] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [eligibleEvents, setEligibleEvents] = useState({}); // ✅ certificate eligibility
 
-  // ✅ Get user role from localStorage
   const userRole = localStorage.getItem("userCategory");
+  const token = localStorage.getItem("token");
 
   // ✅ Fetch all events
   useEffect(() => {
@@ -21,18 +22,45 @@ export default function EventsList() {
       .catch((err) => console.error("Error fetching events:", err));
   }, []);
 
-  // ✅ Book now handler
+  // ✅ Check eligibility for certificate
+  useEffect(() => {
+    if (!token || userRole !== "attendee") return;
+
+    const fetchEligibility = async () => {
+      for (let event of events) {
+        try {
+          const res = await axios.get(
+            `http://localhost:5000/api/certificate/status/${event._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          setEligibleEvents((prev) => ({
+            ...prev,
+            [event._id]: res.data.eligible,
+          }));
+        } catch (err) {
+          console.error("Eligibility check failed", err);
+        }
+      }
+    };
+
+    if (events.length > 0) fetchEligibility();
+  }, [events, token, userRole]);
+
+  // ✅ Book Now
   const handleBookNow = (event) => {
     setSelectedEvent(event);
     setTickets(1);
     setShowModal(true);
   };
 
-  // ✅ Confirm booking handler (fully updated)
+  // ✅ Confirm booking
   const handleConfirmBooking = async () => {
     try {
-      const token = localStorage.getItem("token");
-
       if (!token) {
         alert("You must be logged in to book tickets!");
         return;
@@ -63,12 +91,7 @@ export default function EventsList() {
     }
   };
 
-  // ✅ Edit event handler
-  const handleEditEvent = (eventId) => {
-    alert(`Edit functionality for event ID: ${eventId}`);
-  };
-
-  // ✅ Delete event handler
+  // ✅ Delete event
   const handleDeleteEvent = async (eventId) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
@@ -89,6 +112,7 @@ export default function EventsList() {
   return (
     <div className="events-container">
       <h1>Upcoming Events</h1>
+
       <div className="events-grid">
         {events.map((e) => (
           <div key={e._id} className="event-card">
@@ -97,6 +121,7 @@ export default function EventsList() {
               alt={e.title}
               className="event-image"
             />
+
             <h3>{e.title}</h3>
             <p>{e.description}</p>
             <p>
@@ -110,21 +135,38 @@ export default function EventsList() {
               <strong>Ticket Price:</strong> ₹{e.ticketPrice}
             </p>
 
-            {/* ✅ Conditional buttons */}
+            {/* ✅ Attendee Buttons */}
             {userRole === "attendee" ? (
               <div className="event-buttons">
                 <button className="book-btn" onClick={() => handleBookNow(e)}>
                   Book Now
                 </button>
-              </div>
-            ) : userRole === "organizer" ? (
-              <div className="event-buttons">
+
+                {/* ✅ Certificate Button (FINAL VERSION) */}
                 <button
-                  className="edit-btn"
-                  onClick={() => handleEditEvent(e._id)}
+                  className={`cert-btn ${
+                    eligibleEvents[e._id] ? "active" : "disabled"
+                  }`}
+                  disabled={!eligibleEvents[e._id]}
+                  onClick={() => {
+                    if (!eligibleEvents[e._id]) return;
+
+                    const token = localStorage.getItem("token");
+
+                    window.location.href = `http://localhost:5000/api/certificate/generate/${e._id}?token=${token}`;
+                  }}
                 >
-                  Edit Now
+                  {eligibleEvents[e._id]
+                    ? "Download Certificate"
+                    : "Certificate Not Available"}
                 </button>
+              </div>
+            ) : null}
+
+            {/* ✅ Organizer Buttons */}
+            {userRole === "organizer" ? (
+              <div className="event-buttons">
+                <button className="edit-btn">Edit Now</button>
                 <button
                   className="delete-btn"
                   onClick={() => handleDeleteEvent(e._id)}

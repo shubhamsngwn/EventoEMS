@@ -57,7 +57,14 @@ const EventSchema = new mongoose.Schema({
   Comment: {
     type: [String],
   },
-}, {timestamps: true});
+
+  // ✅ NEW FIELD for Certificate Unlock Delay
+  certificateDelay: {
+    type: Number,
+    default: 1, // minutes after event end when certificate unlocks
+  },
+
+}, { timestamps: true });
 
 const Event = mongoose.model("Event", EventSchema);
 export default Event;

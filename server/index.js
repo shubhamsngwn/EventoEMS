@@ -6,7 +6,10 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import eventRouter from "./routes/eventRoute.js";
-import bookingRoutes from "./routes/bookingRoutes.js";   // ✅ BOOKING ROUTES
+import bookingRoutes from "./routes/bookingRoutes.js";
+import certificateRoutes from "./routes/certificateRoutes.js";
+import cron from "node-cron";
+import Event from "./Models/event.js";
 
 // Load environment variables
 dotenv.config();
@@ -24,7 +27,7 @@ const __dirname = path.dirname(__filename);
 // --- Middleware Setup ---
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"], 
+    origin: ["http://localhost:3000", "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -40,14 +43,15 @@ connectDB();
 // --- API Routes ---
 app.use("/api/auth", authRouter);
 app.use("/api/event", eventRouter);
-app.use("/api/booking", bookingRoutes);   // ✅ BOOKING ROUTES ADDED
+app.use("/api/booking", bookingRoutes);
+app.use("/api/certificate", certificateRoutes);
 
-// --- Root route for testing ---
+// ✅ ROOT route
 app.get("/", (req, res) => {
   res.status(200).send("✅ Evento EMS backend running successfully!");
 });
 
-// --- Global Error Handler ---
+// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error("❌ Error:", err);
   res.status(500).json({
@@ -56,7 +60,22 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ✅ AUTO DELETE OLD EVENTS EVERY MIDNIGHT
+cron.schedule("0 0 * * *", async () => {
+  try {
+    const now = new Date();
+
+    const result = await Event.deleteMany({
+      eventDate: { $lt: now }
+    });
+
+    console.log(`🗑️ Auto-deleted ${result.deletedCount} expired events`);
+  } catch (error) {
+    console.log("Cron Error:", error);
+  }
+});
+
 // --- Start Server ---
 app.listen(PORT, () => {
-  console.log(`Server running on PORT: ${PORT}`);
+  console.log(`✅ Server running on PORT: ${PORT}`);
 });
