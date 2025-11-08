@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
     "dayjs": "^1.11.13",
+    "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
     "react-avatar": "^5.0.4",
     "react-calendar": "^6.0.0",
