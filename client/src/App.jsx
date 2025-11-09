@@ -8,6 +8,7 @@ import Main from "./components/Main";
 import MyCalendar from "./components/MyCalendar";
 import Dashboard from "./components/Dashboard";
 import Wallet from "./components/Wallet";
+import EditEvent from "./components/EditEvent";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/calendar" element={<MyCalendar />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/wallet" element={<Wallet />} />
+          <Route path="/edit-event/:id" element={<EditEvent />} />
         </Routes>
       </Router>
     </>
