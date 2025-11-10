@@ -62,7 +62,6 @@ export const bookEvent = async (req, res) => {
       message: "Booking successful",
       booking: newBooking,
     });
-
   } catch (error) {
     console.log("Booking Error:", error);
     res.status(500).json({
@@ -72,17 +71,18 @@ export const bookEvent = async (req, res) => {
   }
 };
 
-
 // ✅ GET USER BOOKINGS (CALENDAR)
 export const getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ userId: req.id }).populate("eventId");
+    const bookings = await Booking.find({ userId: req.id }).populate({
+      path: "eventId",
+      select: "title description location ticketPrice eventDate",
+    });
 
     res.status(200).json({
       success: true,
       bookings,
     });
-
   } catch (error) {
     console.log("Get Bookings Error:", error);
     res.status(500).json({

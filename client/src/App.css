@@ -1342,3 +1342,16 @@
 .profile-dropdown p:hover {
   background: #f2f2f2;
 }
+
+.event-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4f46e5;
+  margin: 3px auto 0;
+}
+
+.has-event abbr {
+  font-weight: 700;
+  color: #4f46e5;
+}

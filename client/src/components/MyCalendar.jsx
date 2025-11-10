@@ -1,49 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Calendar from "react-calendar";
 import axios from "axios";
 import "../App.css";
 
+function toDateKey(d) {
+  const nd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const y = nd.getFullYear();
+  const m = String(nd.getMonth() + 1).padStart(2, "0");
+  const da = String(nd.getDate()).padStart(2, "0");
+  return `${y}-${m}-${da}`;
+}
+
+function toDateKeyFromISO(iso) {
+  return toDateKey(new Date(iso));
+}
+
 export default function MyApp() {
   const [date, setDate] = useState(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [bookedDates, setBookedDates] = useState([]);
+  const [bookedMap, setBookedMap] = useState({});
 
   const token = localStorage.getItem("token");
 
-  // ✅ Fetch user bookings
-  const fetchBookings = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/booking/my-bookings", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  useEffect(() => {
+    const t = setInterval(() => setCurrentDate(new Date()), 60000);
+    return () => clearInterval(t);
+  }, []);
 
-      if (res.data.success) {
-        const formatted = res.data.bookings.map((b) => ({
-          date: new Date(b.eventId.eventDate).toDateString(),
-          title: b.eventId.title,
-        }));
+  useEffect(() => {
+    if (!token) return;
 
-        setBookedDates(formatted);
+    (async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/booking/my-bookings",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (res.data.success) {
+          const map = {};
+
+          res.data.bookings.forEach(b => {
+            if (!b.eventId) return;
+            const key = toDateKeyFromISO(b.eventId.eventDate);
+
+            if (!map[key]) map[key] = [];
+            map[key].push(b.eventId.title);
+          });
+
+          setBookedMap(map);
+        }
+      } catch (e) {
+        console.log(e);
       }
-    } catch (error) {
-      console.log("Error fetching bookings:", error);
-    }
-  };
+    })();
+  }, [token]);
 
-  useEffect(() => {
-    if (token) fetchBookings();
-  }, []);
-
-  // ✅ Live update current date
-  useEffect(() => {
-    const interval = setInterval(() => setCurrentDate(new Date()), 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ✅ Find event for a specific date
-  const getEventForDate = (date) => {
-    return bookedDates.find((d) => d.date === date.toDateString());
-  };
+  const bookedSet = useMemo(() => new Set(Object.keys(bookedMap)), [bookedMap]);
 
   return (
     <div className="calendar-wrapper">
@@ -51,24 +64,30 @@ export default function MyApp() {
         onChange={setDate}
         value={date}
         className="custom-calendar"
+        tileClassName={({ date, view }) => {
+          if (view !== "month") return "";
+          const key = toDateKey(date);
+          return bookedSet.has(key) ? "has-event" : "";
+        }}
         tileContent={({ date, view }) => {
-          if (view === "month") {
-            const event = getEventForDate(date);
+          if (view !== "month") return null;
+          const key = toDateKey(date);
+          const titles = bookedMap[key];
 
-            if (event) {
-              return (
-                <div className="event-wrapper">
-                  <div className="event-dot"></div>
-                  <div className="event-tooltip">{event.title}</div>
-                </div>
-              );
-            }
-          }
-          return null;
+          if (!titles) return null;
+
+          return (
+            <div
+              className="event-dot"
+              title={titles.join(", ")}
+            />
+          );
         }}
       />
 
-      <p className="selected-date">Current Date: {currentDate.toDateString()}</p>
+      <p className="selected-date">
+        Current Date: {currentDate.toDateString()}
+      </p>
     </div>
   );
 }

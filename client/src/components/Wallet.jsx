@@ -37,38 +37,39 @@ export default function Wallet() {
         {tickets.length === 0 ? (
           <p className="no-tickets">You have no booked tickets.</p>
         ) : (
-          tickets.map((ticket) => (
-            <div key={ticket._id} className="ticket-card">
-              {/* LEFT BOX (QR CODE) */}
-              <div className="qr-box">
-                <QRCodeSVG
-                  value={`ticket-${ticket._id}-${ticket.eventId.title}`}
-                  size={130}
-                />
-                <p className="qr-label">Scan for ticket verification</p>
-              </div>
+          tickets.map((ticket) => {
+            if (!ticket.eventId) return null;
 
-              {/* RIGHT BOX (EVENT DETAILS) */}
-              <div className="ticket-details">
-                <h2>{ticket.eventId.title}</h2>
-                <p>{ticket.eventId.description}</p>
+            return (
+              <div key={ticket._id} className="ticket-card">
+                <div className="qr-box">
+                  <QRCodeSVG
+                    value={`ticket-${ticket._id}-${ticket.eventId.title}`}
+                    size={130}
+                  />
+                  <p className="qr-label">Scan for ticket verification</p>
+                </div>
 
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {new Date(ticket.eventId.eventDate).toDateString()}
-                </p>
-                <p>
-                  <strong>Location:</strong> {ticket.eventId.location}
-                </p>
-                <p>
-                  <strong>Price:</strong> ₹{ticket.eventId.ticketPrice}
-                </p>
-                <p>
-                  <strong>Seats:</strong> {ticket.seatsBooked}
-                </p>
+                <div className="ticket-details">
+                  <h2>{ticket.eventId.title}</h2>
+                  <p>{ticket.eventId.description}</p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {new Date(ticket.eventId.eventDate).toDateString()}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {ticket.eventId.location}
+                  </p>
+                  <p>
+                    <strong>Price:</strong> ₹{ticket.eventId.ticketPrice}
+                  </p>
+                  <p>
+                    <strong>Seats:</strong> {ticket.seatsBooked}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </>
