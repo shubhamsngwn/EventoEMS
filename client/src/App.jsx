@@ -1,6 +1,5 @@
 import "./App.css";
 import CreateEvent from "./components/CreateEvent";
-import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./components/Signup";
