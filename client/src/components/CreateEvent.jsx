@@ -41,19 +41,32 @@ export default function CreateEvent() {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("token"); // Get JWT token
+
+      if (!token) {
+        alert("You must be logged in to create an event!");
+        return;
+      }
+
       const formData = new FormData();
 
+      // Append all event fields
       Object.entries(eventData).forEach(([key, value]) => {
         formData.append(key, value);
       });
 
       if (eventDate)
         formData.append("eventDate", eventDate.format("YYYY-MM-DD"));
+
       if (eventTime) formData.append("eventTime", eventTime.format("HH:mm"));
 
+      // Send request with Authorization header
       const res = await fetch("http://localhost:5000/api/event/createEvent", {
         method: "POST",
-        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`, // 🔥 Token added here
+        },
+        body: formData, // DO NOT manually set Content-Type
       });
 
       const data = await res.json();

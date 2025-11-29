@@ -22,6 +22,7 @@ export default function MyApp() {
 
   const token = localStorage.getItem("token");
 
+  // Auto update time after every minute
   useEffect(() => {
     const t = setInterval(() => setCurrentDate(new Date()), 60000);
     return () => clearInterval(t);

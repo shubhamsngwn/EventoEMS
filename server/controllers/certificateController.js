@@ -56,10 +56,10 @@ export const generateCertificate = async (req, res) => {
 
     // ---------------------- DESIGN START ----------------------
 
-    doc
-      .fontSize(28)
-      .fillColor("#333")
-      .text("Certificate of Participation", { align: "center", underline: true });
+    doc.fontSize(28).fillColor("#333").text("Certificate of Participation", {
+      align: "center",
+      underline: true,
+    });
 
     doc.moveDown(2);
 
@@ -80,10 +80,9 @@ export const generateCertificate = async (req, res) => {
     doc
       .fontSize(16)
       .fillColor("#000")
-      .text(
-        `For successfully participating in the event "${event.title}".`,
-        { align: "center" }
-      );
+      .text(`For successfully participating in the event "${event.title}".`, {
+        align: "center",
+      });
 
     doc.moveDown();
 
@@ -110,7 +109,6 @@ export const generateCertificate = async (req, res) => {
     stream.on("finish", () => {
       res.download(filePath, `${user.name}_certificate.pdf`);
     });
-
   } catch (error) {
     console.log("Certificate Error:", error);
     res.status(500).json({
@@ -120,8 +118,8 @@ export const generateCertificate = async (req, res) => {
   }
 };
 
-
 // ---------------------- CERTIFICATE STATUS ------------------------
+
 export const checkCertificateStatus = async (req, res) => {
   try {
     const eventId = req.params.eventId;
@@ -133,16 +131,33 @@ export const checkCertificateStatus = async (req, res) => {
     const booking = await Booking.findOne({ eventId, userId });
     if (!booking) return res.json({ eligible: false });
 
-    // ✅ Time logic
-    const eventEnd = new Date(event.eventDate);
-    const unlockTime = new Date(eventEnd.getTime() + event.certificateDelay * 60000);
+    // ------------------ EVENT DATE + TIME COMBINE ------------------
+    const eventDate = new Date(event.eventDate);
+
+    // event.eventTime = "HH:mm"
+    const [hours, minutes] = event.eventTime.split(":").map(Number);
+
+    // eventDate ko event ke exact start time par set karo
+    eventDate.setHours(hours);
+    eventDate.setMinutes(minutes);
+    eventDate.setSeconds(0);
+    eventDate.setMilliseconds(0);
+
+    // ---------- UNLOCK TIME = EVENT START TIME + DELAY ----------
+    const unlockTime = new Date(
+      eventDate.getTime() + (event.certificateDelay || 1) * 60000
+    );
+
     const now = new Date();
 
-    if (now >= unlockTime) return res.json({ eligible: true });
+    // Check eligibility
+    if (now >= unlockTime) {
+      return res.json({ eligible: true });
+    }
 
     return res.json({ eligible: false });
   } catch (error) {
     console.log(error);
-    res.json({ eligible: false });
+    return res.json({ eligible: false });
   }
 };
